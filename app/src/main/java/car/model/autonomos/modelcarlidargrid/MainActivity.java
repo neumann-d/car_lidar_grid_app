@@ -4,6 +4,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.LinearLayout;
 
 import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
@@ -23,6 +24,8 @@ import sensor_msgs.LaserScan;
 
 public class MainActivity extends RosAppActivity implements NodeMain {
 
+    private PixelGridView pixelGrid;
+
     public MainActivity() {
         super("MainActivity", "MainActivity");
     }
@@ -41,7 +44,7 @@ public class MainActivity extends RosAppActivity implements NodeMain {
 
 
 
-        PixelGridView pixelGrid = new PixelGridView(this);
+        pixelGrid = new PixelGridView(this);
         pixelGrid.setNumColumns(16);
         pixelGrid.setNumRows(24);
 
@@ -67,13 +70,21 @@ public class MainActivity extends RosAppActivity implements NodeMain {
 
         NameResolver appNameSpace = getMasterNameSpace();
 
-        String lidarTopic = appNameSpace.resolve("/scan").toString();
+        String lidarTopic = appNameSpace.resolve("scan").toString();
 
-        Subscriber<LaserScan> subscriberLidar = connectedNode.newSubscriber(lidarTopic, sensor_msgs.LaserScan._TYPE);
-        subscriberLidar.addMessageListener(new MessageListener<LaserScan>() {
+        Subscriber<sensor_msgs.LaserScan> subscriberLidar = connectedNode.newSubscriber(lidarTopic, sensor_msgs.LaserScan._TYPE);
+        subscriberLidar.addMessageListener(new MessageListener<sensor_msgs.LaserScan>() {
             @Override
             public void onNewMessage(final sensor_msgs.LaserScan message) {
-                // handle lidar message
+                float startAngle = message.getAngleMin();
+                float[] ranges = message.getRanges();
+
+                Log.d("car_lidar_grid", "message.getAngleMin() = " + startAngle);
+                Log.d("car_lidar_grid", "message.getRanges() = " + ranges.length);
+
+                pixelGrid.setCellChecked(6, 8);
+
+                pixelGrid.setCellChecked(8, 10);
             }
         });
     }
@@ -121,6 +132,6 @@ public class MainActivity extends RosAppActivity implements NodeMain {
         NodeConfiguration nodeConfiguration =
                 NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
 
-        nodeMainExecutor.execute(this, nodeConfiguration.setNodeName("android/video_view"));
+        nodeMainExecutor.execute(this, nodeConfiguration.setNodeName("android/lidar_grid"));
     }
 }

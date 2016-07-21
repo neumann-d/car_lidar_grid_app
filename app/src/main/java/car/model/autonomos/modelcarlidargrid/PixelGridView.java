@@ -23,6 +23,12 @@ public class PixelGridView extends View {
         cellFillPaint.setStyle(Paint.Style.FILL_AND_STROKE);
     }
 
+    public void setCellChecked(int x, int y) {
+        if(x < numColumns && y < numRows) {
+            cellChecked[x][y] = true;
+        }
+    }
+
     public void setNumColumns(int numColumns) {
         this.numColumns = numColumns;
         calculateDimensions();
