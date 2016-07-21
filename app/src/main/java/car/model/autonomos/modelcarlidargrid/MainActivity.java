@@ -1,8 +1,10 @@
 package car.model.autonomos.modelcarlidargrid;
 
 import android.graphics.drawable.BitmapDrawable;
+import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 
 import com.github.rosjava.android_remocons.common_tools.apps.RosAppActivity;
 
@@ -27,27 +29,31 @@ public class MainActivity extends RosAppActivity implements NodeMain {
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        setDefaultMasterName("");
-        setDefaultAppName("car_lidar_grid");
+        setDefaultMasterName(getString(R.string.default_robot));
+        setDefaultAppName(getString(R.string.default_app));
+        setDashboardResource(R.id.LidarGridView);
+        setMainWindowResource(R.layout.activity_main);
 
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_main);
+
+        LinearLayout grid = (LinearLayout) findViewById(R.id.LidarGridView);
+
+
 
         PixelGridView pixelGrid = new PixelGridView(this);
         pixelGrid.setNumColumns(16);
         pixelGrid.setNumRows(24);
 
-        setContentView(pixelGrid);
-    }
+        grid.addView(pixelGrid);
 
-    @Override
-    protected void init(NodeMainExecutor nodeMainExecutor) {
-        super.init(nodeMainExecutor);
+        // setContentView(pixelGrid);
 
-        NodeConfiguration nodeConfiguration =
-                NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
-
-        nodeMainExecutor.execute(this, nodeConfiguration.setNodeName("android/car_lidar_grid_view"));
+        // TODO Tricky solution to the StrictMode; the recommended way is by using AsyncTask
+        if (android.os.Build.VERSION.SDK_INT > 9) {
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
     }
 
     @Override
@@ -57,6 +63,8 @@ public class MainActivity extends RosAppActivity implements NodeMain {
 
     @Override
     public void onStart(ConnectedNode connectedNode) {
+        super.onStart();
+
         NameResolver appNameSpace = getMasterNameSpace();
 
         String lidarTopic = appNameSpace.resolve("/scan").toString();
@@ -65,11 +73,30 @@ public class MainActivity extends RosAppActivity implements NodeMain {
         subscriberLidar.addMessageListener(new MessageListener<LaserScan>() {
             @Override
             public void onNewMessage(final sensor_msgs.LaserScan message) {
-
-
-
+                // handle lidar message
             }
         });
+    }
+
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
+
+    @Override
+    protected void onRestart() {
+        super.onRestart();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     @Override
@@ -85,5 +112,15 @@ public class MainActivity extends RosAppActivity implements NodeMain {
     @Override
     public void onError(Node node, Throwable throwable) {
 
+    }
+
+    @Override
+    protected void init(NodeMainExecutor nodeMainExecutor) {
+        super.init(nodeMainExecutor);
+
+        NodeConfiguration nodeConfiguration =
+                NodeConfiguration.newPublic(InetAddressFactory.newNonLoopback().getHostAddress(), getMasterUri());
+
+        nodeMainExecutor.execute(this, nodeConfiguration.setNodeName("android/video_view"));
     }
 }

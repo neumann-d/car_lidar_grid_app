@@ -11,15 +11,25 @@
         android:largeHeap="true"
         tools:replace="icon, label"
         android:label="@string/app_name"
-        android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="com.github.turtlebot.turtlebot_android.panorama.PanoramaActivity" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
         </activity>
+
+        <activity android:name="org.ros.android.MasterChooser" />
+
+        <service android:name="org.ros.android.NodeMainExecutorService">
+            <intent-filter>
+                <action android:name="org.ros.android.NodeMainExecutorService" />
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>

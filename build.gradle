@@ -4,12 +4,17 @@
 apply from: "https://github.com/rosjava/rosjava_bootstrap/raw/indigo/gradle.gradle"
 
 buildscript {
+    repositories {
+        jcenter()
+    }
     apply from: "https://github.com/rosjava/android_core/raw/indigo/buildscript.gradle"
     dependencies {
         classpath 'com.android.tools.build:gradle:2.1.0'
+        classpath "com.kageiit:url-cache-plugin:1.0.0"
     }
 }
 
+apply plugin: 'com.kageiit.url-cache'
 apply plugin: 'catkin'
 
 allprojects {
